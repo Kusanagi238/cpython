@@ -42,6 +42,8 @@ def get_first_executor(func):
 
 
 def iter_opnames(ex):
+    if ex is None:
+        return
     for item in ex:
         yield item[0]
 
@@ -1241,8 +1243,8 @@ class TestUopsOptimization(unittest.TestCase):
             pass
 
         res, ex = self._run_with_optimizer(thing, Foo())
-        opnames = list(iter_opnames(ex))
         self.assertIsNotNone(ex)
+        opnames = list(iter_opnames(ex))
         self.assertEqual(res, TIER2_THRESHOLD * 6 + 1)
         call = opnames.index("_CALL_BUILTIN_FAST")
         load_attr_top = opnames.index("_POP_TOP_LOAD_CONST_INLINE_BORROW", 0, call)
@@ -2035,6 +2037,7 @@ class TestUopsOptimization(unittest.TestCase):
                 _ = len(a) - 1
 
         _, ex = self._run_with_optimizer(testfunc, TIER2_THRESHOLD)
+        self.assertIsNotNone(ex)
         uops = get_opnames(ex)
         self.assertNotIn("_GUARD_NOS_NULL", uops)
         self.assertNotIn("_GUARD_CALLABLE_LEN", uops)
@@ -2103,6 +2106,7 @@ class TestUopsOptimization(unittest.TestCase):
             return x
         res, ex = self._run_with_optimizer(testfunc, TIER2_THRESHOLD)
         self.assertEqual(int(res), TIER2_THRESHOLD)
+        self.assertIsNotNone(ex)
         uops = get_opnames(ex)
         self.assertNotIn("_GUARD_NOS_INT", uops)
         self.assertNotIn("_GET_LEN", uops)
@@ -2118,6 +2122,7 @@ class TestUopsOptimization(unittest.TestCase):
             return x
         res, ex = self._run_with_optimizer(testfunc, TIER2_THRESHOLD)
         self.assertEqual(int(res), TIER2_THRESHOLD)
+        self.assertIsNotNone(ex)
         uops = get_opnames(ex)
         self.assertNotIn("_GUARD_NOS_INT", uops)
         self.assertNotIn("_GET_LEN", uops)
@@ -2133,6 +2138,7 @@ class TestUopsOptimization(unittest.TestCase):
             return x
         res, ex = self._run_with_optimizer(testfunc, TIER2_THRESHOLD)
         self.assertEqual(int(res), TIER2_THRESHOLD)
+        self.assertIsNotNone(ex)
         uops = get_opnames(ex)
         self.assertNotIn("_GUARD_NOS_INT", uops)
         self.assertIn("_GET_LEN", uops)
@@ -2184,6 +2190,7 @@ class TestUopsOptimization(unittest.TestCase):
 
         res, ex = self._run_with_optimizer(testfunc, TIER2_THRESHOLD)
         self.assertEqual(res, sum(range(TIER2_THRESHOLD)))
+        self.assertIsNotNone(ex)
         uops = get_opnames(ex)
         self.assertIn("_CALL_LIST_APPEND", uops)
         # We should remove these in the future
